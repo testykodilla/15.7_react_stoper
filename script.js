@@ -1,14 +1,15 @@
 class Stopwatch extends React.Component {
     constructor(display) {
         super();
+        this.watch = null;
+        this.running = false;
+        
         this.state = {
-            running: false,
             times: {
                 minutes: 0,
                 seconds: 0,
                 miliseconds: 0
             },
-            watch: ''
         };
     }
     
@@ -18,32 +19,35 @@ class Stopwatch extends React.Component {
 
     start = () => {
         if (!this.state.running) {
-            this.state.running = true;
-            this.state.watch = setInterval(() => this.step(), 10);
+            this.running = true;
+            this.watch = setInterval(() => this.step(), 10);
         }
     }
 
     step = () => {
-        if (!this.state.running) return;
+        if (!this.running) return;
         this.calculate() ;
     }
 
     calculate = () => {
-        const copy = this.state.times;
-        copy.miliseconds = this.state.times.miliseconds + 1
-        this.setState({times: copy});
-        if (this.state.times.miliseconds >= 100) {
-            this.state.times.seconds += 1;
-            this.state.times.miliseconds = 0;
-        }
-        if (this.state.times.seconds >= 60) {
-            this.state.times.minutes += 1;
-            this.state.times.seconds = 0;
-        }
+        this.setState(prevState => {
+            prevState.times.miliseconds = prevState.times.miliseconds + 1;
+
+            if (prevState.times.miliseconds >= 100) {
+                prevState.times.seconds += 1;
+                prevState.times.miliseconds = 0;
+            }
+            if (prevState.times.seconds >= 60) {
+                prevState.times.minutes += 1;
+                prevState.times.seconds = 0;
+            }
+
+            return prevState;
+        });        
     }
 
     stop = () => {
-        this.state.running = false;
+        this.running = false;
         clearInterval(this.watch);
     }
 
